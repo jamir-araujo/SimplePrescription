@@ -7,9 +7,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Prescription", "Prescriptio
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TherapeuticPlanning", "TherapeuticPlanning", "{CFD8B756-D8EE-4975-AA5B-B090F2A2B85C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Prescription.Domain", "Prescription.Domain\Prescription.Domain.csproj", "{89B8CE0C-F0CD-4D06-B02E-1DCAFEEEC018}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Prescription.Domain", "Prescription.Domain\Prescription.Domain.csproj", "{89B8CE0C-F0CD-4D06-B02E-1DCAFEEEC018}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TherapeuticPlanning.Domain", "TherapeuticPlanning.Domain\TherapeuticPlanning.Domain.csproj", "{975FBFED-04A6-4C05-9307-E6FB8353A710}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TherapeuticPlanning.Domain", "TherapeuticPlanning.Domain\TherapeuticPlanning.Domain.csproj", "{975FBFED-04A6-4C05-9307-E6FB8353A710}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Prescription.Domain.Tests", "Prescription.Domain.Tests\Prescription.Domain.Tests.csproj", "{73390E5C-010D-49C9-95BE-046E44A37E58}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,6 +27,10 @@ Global
 		{975FBFED-04A6-4C05-9307-E6FB8353A710}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{975FBFED-04A6-4C05-9307-E6FB8353A710}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{975FBFED-04A6-4C05-9307-E6FB8353A710}.Release|Any CPU.Build.0 = Release|Any CPU
+		{73390E5C-010D-49C9-95BE-046E44A37E58}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{73390E5C-010D-49C9-95BE-046E44A37E58}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{73390E5C-010D-49C9-95BE-046E44A37E58}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{73390E5C-010D-49C9-95BE-046E44A37E58}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -32,6 +38,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{89B8CE0C-F0CD-4D06-B02E-1DCAFEEEC018} = {ABA9CED2-ADE4-49BC-AF29-80A5EF264954}
 		{975FBFED-04A6-4C05-9307-E6FB8353A710} = {CFD8B756-D8EE-4975-AA5B-B090F2A2B85C}
+		{73390E5C-010D-49C9-95BE-046E44A37E58} = {ABA9CED2-ADE4-49BC-AF29-80A5EF264954}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7E965943-B5AD-41BB-A4C5-F404920AC186}
