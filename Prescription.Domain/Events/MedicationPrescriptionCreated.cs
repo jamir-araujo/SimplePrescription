@@ -1,7 +1,5 @@
 ﻿using EventFlow.Aggregates;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Prescription.Domain.Events
 {

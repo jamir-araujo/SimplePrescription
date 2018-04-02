@@ -1,8 +1,7 @@
 ﻿using EventFlow.Aggregates;
-using Prescription.Domain;
 using System;
 
-namespace Prescription.Events
+namespace Prescription.Domain.Events
 {
     public class PrescriptionCreated : AggregateEvent<Domain.Prescription, PrescriptionId>
     {

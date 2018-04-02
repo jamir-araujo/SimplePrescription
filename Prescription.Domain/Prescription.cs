@@ -1,37 +1,58 @@
-﻿using EventFlow.Aggregates;
+﻿using System;
+using System.Collections.Generic;
+using EventFlow.Aggregates;
 using EventFlow.Core;
 using EventFlow.ValueObjects;
 using Newtonsoft.Json;
-using Prescription.Events;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using Prescription.Domain.Events;
 
 namespace Prescription.Domain
 {
     public class Prescription : AggregateRoot<Prescription, PrescriptionId>
     {
         private Guid _patientId;
-        private string _pattineName;
+        private string _patientName;
         private DateTime _createdDate;
+        private List<MedicationPrescriptionId> _medications;
 
-        protected Prescription(PrescriptionId id) 
+        internal Prescription(PrescriptionId id)
             : base(id)
         {
             Register<PrescriptionCreated>(OnPrescriptionCreated);
+            Register<MedicationPrescriptionAdded>(OnMedicationPrescriptionAdded);
         }
 
-        public Prescription(PrescriptionId id, Guid patientId, string patientName)
-            : this(id)
+        public void Create(Guid patientId, string patientName)
         {
+            if (!IsNew)
+            {
+                throw new InvalidOperationException("Cannot call Create on an already existing Prescription");
+            }
+
             Emit(new PrescriptionCreated(Id, patientId, patientName, DateTime.UtcNow));
         }
 
-        private void OnPrescriptionCreated(PrescriptionCreated prescriptionCreated)
+        public void AddMedicationPrescription(MedicationPrescriptionId medicationPrescriptionId)
         {
-            _patientId = prescriptionCreated.PatientId;
-            _pattineName = prescriptionCreated.PatientName;
-            _createdDate = prescriptionCreated.CreateDate;
+            if (IsNew)
+            {
+                throw new InvalidOperationException("Cannot call AddMedicationPrecription on a newly created Prescription");
+            }
+
+            Emit(new MedicationPrescriptionAdded(Id, medicationPrescriptionId));
+        }
+
+        private void OnPrescriptionCreated(PrescriptionCreated @event)
+        {
+            _patientId = @event.PatientId;
+            _patientName = @event.PatientName;
+            _createdDate = @event.CreateDate;
+        }
+
+        private void OnMedicationPrescriptionAdded(MedicationPrescriptionAdded @event)
+        {
+            _medications = _medications ?? new List<MedicationPrescriptionId>();
+            _medications.Add(@event.MedicationPrescriptionId);
         }
     }
 

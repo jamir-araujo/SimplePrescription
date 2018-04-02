@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="EventFlow" Version="0.54.3261" />
+    <ProjectReference Include="..\Prescription.Domain\Prescription.Domain.csproj" />
   </ItemGroup>
 
 </Project>

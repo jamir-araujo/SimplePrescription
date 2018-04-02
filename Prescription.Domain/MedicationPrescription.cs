@@ -13,22 +13,20 @@ namespace Prescription.Domain
         private int _frequency;
         private string _administrationRoute;
 
-        protected MedicationPrescription(MedicationPrescriptionId id)
+        internal MedicationPrescription(MedicationPrescriptionId id)
             : base(id)
         {
             Register<MedicationPrescriptionCreated>(OnMedicationPrescriptionCreated);
         }
 
-        public MedicationPrescription(
-            MedicationPrescriptionId id,
-            PrescriptionId prescriptionId,
-            string medicationName,
-            int quantity,
-            int frequency,
-            string adminitrationRoute)
-            : this(id)
+        public void Create(PrescriptionId prescriptionId, string medicationName, int quantity, int frequency, string adminitrationRoute)
         {
-            Emit(new MedicationPrescriptionCreated(id, prescriptionId, medicationName, quantity, frequency, adminitrationRoute, DateTime.UtcNow));
+            if (!IsNew)
+            {
+                throw new InvalidOperationException("Cannot call Create on an already existing MedicationPrescription");
+            }
+
+            Emit(new MedicationPrescriptionCreated(Id, prescriptionId, medicationName, quantity, frequency, adminitrationRoute, DateTime.UtcNow));
         }
 
         private void OnMedicationPrescriptionCreated(MedicationPrescriptionCreated @event)
