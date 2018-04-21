@@ -3,7 +3,7 @@ using System;
 
 namespace Prescription.Domain.Events
 {
-    public class PrescriptionCreated : AggregateEvent<Domain.Prescription, PrescriptionId>
+    public class PrescriptionCreated : AggregateEvent<Prescription, PrescriptionId>
     {
         public PrescriptionId PrescriptionId { get; set; }
         public Guid PatientId { get; set; }

@@ -5,9 +5,9 @@ using EventFlow.Commands;
 
 namespace Prescription.Domain.Commands
 {
-    public class CreateNewMedicationPrescription : Command<MedicationPrescription, MedicationPrescriptionId>
+    public class AddMedicationPrescription : Command<Prescription, PrescriptionId>
     {
-        public CreateNewMedicationPrescription(MedicationPrescriptionId id)
+        public AddMedicationPrescription(PrescriptionId id)
             : base(id)
         {
 

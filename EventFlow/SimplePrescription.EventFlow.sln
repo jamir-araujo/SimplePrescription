@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TherapeuticPlanning.Domain"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Prescription.Tests", "Prescription.Domain.Tests\Prescription.Tests.csproj", "{73390E5C-010D-49C9-95BE-046E44A37E58}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Prescription.Application", "Prescription.Application\Prescription.Application.csproj", "{21DACB05-11A1-4F58-A4AC-6091C54519E1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Prescription.Application", "Prescription.Application\Prescription.Application.csproj", "{21DACB05-11A1-4F58-A4AC-6091C54519E1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

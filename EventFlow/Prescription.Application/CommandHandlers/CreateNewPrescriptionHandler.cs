@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using EventFlow.Commands;
 using Prescription.Domain;
@@ -9,13 +8,10 @@ namespace Prescription.Application.CommandHandlers
 {
     public class CreateNewPrescriptionHandler : CommandHandler<Domain.Prescription, PrescriptionId, CreateNewPrescription>
     {
-        public CreateNewPrescriptionHandler()
-        {
-
-        }
-
         public override Task ExecuteAsync(Domain.Prescription aggregate, CreateNewPrescription command, CancellationToken cancellationToken)
         {
+            aggregate.Create(command.PatientId, command.PatientName);
+
             return Task.CompletedTask;
         }
     }

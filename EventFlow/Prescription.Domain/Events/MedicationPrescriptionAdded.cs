@@ -1,9 +1,9 @@
-﻿using EventFlow.Aggregates;
-using System;
+﻿using System;
+using EventFlow.Aggregates;
 
 namespace Prescription.Domain.Events
 {
-    public class MedicationPrescriptionCreated : AggregateEvent<MedicationPrescription, MedicationPrescriptionId>
+    public class MedicationPrescriptionAdded : AggregateEvent<Prescription, PrescriptionId>
     {
         public PrescriptionId PrescriptionId { get; set; }
         public MedicationPrescriptionId MedicationPrescriptionId { get; set; }
@@ -11,16 +11,16 @@ namespace Prescription.Domain.Events
         public decimal Quantity { get; set; }
         public int Frequency { get; set; }
         public string AdminitrationRoute { get; set; }
-        public DateTime CreateDate { get; set; }
+        public DateTimeOffset CreateDate { get; set; }
 
-        public MedicationPrescriptionCreated(
+        public MedicationPrescriptionAdded(
             MedicationPrescriptionId medicationPrescriptionId,
             PrescriptionId prescriptionId,
             string medicationName,
             decimal quantity,
             int frequency,
             string adminitrationRoute,
-            DateTime createDate)
+            DateTimeOffset createDate)
         {
             PrescriptionId = prescriptionId;
             MedicationPrescriptionId = medicationPrescriptionId;

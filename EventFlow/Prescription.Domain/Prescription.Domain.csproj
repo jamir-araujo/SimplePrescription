@@ -5,7 +5,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="..\Shared\Checks.cs" Link="Helpers\Checks.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="EventFlow" Version="0.54.3261" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="EventHandlers\" />
+    <Folder Include="Helpers\" />
   </ItemGroup>
 
 </Project>

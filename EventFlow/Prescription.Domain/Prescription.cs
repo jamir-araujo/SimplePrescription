@@ -13,7 +13,7 @@ namespace Prescription.Domain
         private Guid _patientId;
         private string _patientName;
         private DateTime _createdDate;
-        private List<MedicationPrescriptionId> _medications;
+        private List<MedicationPrescription> _medications;
 
         internal Prescription(PrescriptionId id)
             : base(id)
@@ -32,14 +32,22 @@ namespace Prescription.Domain
             Emit(new PrescriptionCreated(Id, patientId, patientName, DateTime.UtcNow));
         }
 
-        public void AddMedicationPrescription(MedicationPrescriptionId medicationPrescriptionId)
+        public void AddMedicationPrescription(
+            MedicationPrescriptionId medicationPrescriptionId,
+            string medicationName,
+            decimal quantity,
+            int frequency,
+            string administrationRoute)
         {
+            Checks.NotNull(medicationPrescriptionId, nameof(medicationPrescriptionId));
+            Checks.NotNullEmptyOrWhiteSpaces(medicationName, nameof(medicationName));
+
             if (IsNew)
             {
                 throw new InvalidOperationException("Cannot call AddMedicationPrecription on a newly created Prescription");
             }
 
-            Emit(new MedicationPrescriptionAdded(Id, medicationPrescriptionId));
+            Emit(new MedicationPrescriptionAdded(medicationPrescriptionId, Id, medicationName, quantity, frequency, administrationRoute, DateTimeOffset.Now));
         }
 
         private void OnPrescriptionCreated(PrescriptionCreated @event)
@@ -51,8 +59,8 @@ namespace Prescription.Domain
 
         private void OnMedicationPrescriptionAdded(MedicationPrescriptionAdded @event)
         {
-            _medications = _medications ?? new List<MedicationPrescriptionId>();
-            _medications.Add(@event.MedicationPrescriptionId);
+            _medications = _medications ?? new List<MedicationPrescription>();
+            //_medications.Add(@event.MedicationPrescriptionId);
         }
     }
 

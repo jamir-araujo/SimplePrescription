@@ -47,11 +47,35 @@ namespace Prescription.Tests
         }
 
         [Fact]
+        public void AddMedicationPrescription_Should_Throw_When_MedicationPrescriptionIdIsNull()
+        {
+            Assert.Throws<ArgumentNullException>("medicationPrescriptionId", () => _sut.AddMedicationPrescription(null, "medicatioName", 1, 1, "administrationRoute"));
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData("   ")]
+        public void AddMedicationPrescription_Should_Throw_When_MedicationNameIdNullEmptyOrWhiteSpaces(string medicatioName)
+        {
+            Assert.Throws<ArgumentNullException>("medicationName", () => _sut.AddMedicationPrescription(MedicationPrescriptionId.New, medicatioName, 1, 1, "administrationRoute"));
+        }
+
+        [Fact]
         public void AddMedicationPrescription_Should_EmitMedicationAddedEvent()
         {
             var medicationPrescriptionId = MedicationPrescriptionId.New;
+            var medicationName = "medicationName";
+            var quantity = 1M;
+            var frequency = 1;
+            var administrationRoute = "administrationRoute";
 
-            _sut.AddMedicationPrescription(medicationPrescriptionId);
+            _sut.AddMedicationPrescription(
+                medicationPrescriptionId, 
+                medicationName,
+                quantity,
+                frequency,
+                administrationRoute);
 
             var uncommitedEvents = _sut.UncommittedEvents.ToList();
 
@@ -63,10 +87,15 @@ namespace Prescription.Tests
         [Fact]
         public void AddMedicationPrescription_Should_Throw_When_AggregateIsNew()
         {
-            var medicationPrescriptionId = MedicationPrescriptionId.New;
             var newSut = new Domain.Prescription(PrescriptionId.New);
 
-            Assert.Throws<InvalidOperationException>(() => newSut.AddMedicationPrescription(medicationPrescriptionId));
+            var medicationPrescriptionId = MedicationPrescriptionId.New;
+            var medicationName = "medicationName";
+            var quantity = 1M;
+            var frequency = 1;
+            var administrationRoute = "administrationRoute";
+
+            Assert.Throws<InvalidOperationException>(() => newSut.AddMedicationPrescription(medicationPrescriptionId, medicationName, quantity, frequency, administrationRoute));
         }
     }
 }
