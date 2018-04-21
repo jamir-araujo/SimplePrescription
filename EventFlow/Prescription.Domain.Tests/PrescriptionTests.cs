@@ -56,9 +56,34 @@ namespace Prescription.Tests
         [InlineData(null)]
         [InlineData("")]
         [InlineData("   ")]
-        public void AddMedicationPrescription_Should_Throw_When_MedicationNameIdNullEmptyOrWhiteSpaces(string medicatioName)
+        public void AddMedicationPrescription_Should_Throw_When_MedicationNameIdIsNullEmptyOrWhiteSpaces(string medicatioName)
         {
             Assert.Throws<ArgumentNullException>("medicationName", () => _sut.AddMedicationPrescription(MedicationPrescriptionId.New, medicatioName, 1, 1, "administrationRoute"));
+        }
+
+        [Theory]
+        [InlineData(0)]
+        [InlineData(-1)]
+        public void AddMedicationPrescription_Should_Throw_When_QuantityIsZeroOrLess(decimal quantity)
+        {
+            Assert.Throws<InvalidOperationException>(() => _sut.AddMedicationPrescription(MedicationPrescriptionId.New, "medicationName", quantity, 1, "administrationRoute"));
+        }
+
+        [Theory]
+        [InlineData(0)]
+        [InlineData(-1)]
+        public void AddMedicationPrescription_Should_Throw_When_FrequencyIsZeroOrLess(int frequency)
+        {
+            Assert.Throws<InvalidOperationException>(() => _sut.AddMedicationPrescription(MedicationPrescriptionId.New, "medicationName", 1, frequency, "administrationRoute"));
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData("")]
+        [InlineData("   ")]
+        public void AddMedicationPrescription_Should_Throw_When_AdministrationRouteIsNullEmptyOrWhiteSpaces(string administrationRoute)
+        {
+            Assert.Throws<ArgumentNullException>(() => _sut.AddMedicationPrescription(MedicationPrescriptionId.New, "medicationName", 1, 1, administrationRoute));
         }
 
         [Fact]

@@ -33,5 +33,15 @@ namespace Prescription
 
             return value;
         }
+
+        public static int NotZeroOrLess(int value, string parameterName)
+        {
+            if (value <= 0)
+            {
+                throw new InvalidOperationException($"parameter {parameterName} cannot be zero o less");
+            }
+
+            return value;
+        }
     }
 }

@@ -41,6 +41,9 @@ namespace Prescription.Domain
         {
             Checks.NotNull(medicationPrescriptionId, nameof(medicationPrescriptionId));
             Checks.NotNullEmptyOrWhiteSpaces(medicationName, nameof(medicationName));
+            Checks.NotZeroOrLess(quantity, nameof(quantity));
+            Checks.NotZeroOrLess(frequency, nameof(frequency));
+            Checks.NotNullEmptyOrWhiteSpaces(administrationRoute, nameof(administrationRoute));
 
             if (IsNew)
             {
