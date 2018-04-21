@@ -63,7 +63,24 @@ namespace Prescription.Domain
         private void OnMedicationPrescriptionAdded(MedicationPrescriptionAdded @event)
         {
             _medications = _medications ?? new List<MedicationPrescription>();
-            //_medications.Add(@event.MedicationPrescriptionId);
+            _medications.Add(new MedicationPrescription(
+                @event.MedicationPrescriptionId,
+                @event.PrescriptionId,
+                @event.MedicationName,
+                @event.Quantity,
+                @event.Frequency,
+                @event.AdminitrationRoute,
+                @event.CreatedDate));
+        }
+
+        internal PrescriptionSnapshot GetSnapshot()
+        {
+            return new PrescriptionSnapshot(
+                Id.GetGuid(),
+                _patientId,
+                _patientName,
+                _createdDate,
+                _medications);
         }
     }
 

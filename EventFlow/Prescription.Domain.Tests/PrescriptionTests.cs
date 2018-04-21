@@ -25,7 +25,7 @@ namespace Prescription.Tests
         }
 
         [Fact]
-        public void Create_Should_EmitPrescriptionCreatedEvent()
+        public void Create_Should_EmitPrescriptionCreatedEventAndSetTheStateCorrectly()
         {
             var newSut = new Domain.Prescription(_sutId);
             newSut.Create(_patientId, _patientName);
@@ -38,6 +38,13 @@ namespace Prescription.Tests
             Assert.Equal(_patientId, @event.PatientId);
             Assert.Equal(_patientName, @event.PatientName);
             Assert.InRange(@event.CreateDate, DateTime.UtcNow.AddSeconds(-1), DateTime.UtcNow);
+
+            var sutSnapshot = newSut.GetSnapshot();
+
+            Assert.Equal(_sutId.GetGuid(), sutSnapshot.PrescriptionId);
+            Assert.Equal(_patientId, sutSnapshot.PatientId);
+            Assert.Equal(_patientName, sutSnapshot.PatientName);
+            Assert.InRange(sutSnapshot.CreatedDate, DateTime.UtcNow.AddSeconds(-1), DateTime.UtcNow);
         }
 
         [Fact]
@@ -87,7 +94,7 @@ namespace Prescription.Tests
         }
 
         [Fact]
-        public void AddMedicationPrescription_Should_EmitMedicationAddedEvent()
+        public void AddMedicationPrescription_Should_EmitMedicationAddedEventAndAddTheMedicationToTheInternalList()
         {
             var medicationPrescriptionId = MedicationPrescriptionId.New;
             var medicationName = "medicationName";
@@ -107,6 +114,22 @@ namespace Prescription.Tests
             var uncommitedEvent = Assert.Single(uncommitedEvents);
             var @event = Assert.IsType<MedicationPrescriptionAdded>(uncommitedEvent.AggregateEvent);
             Assert.Equal(medicationPrescriptionId, @event.MedicationPrescriptionId);
+            Assert.Equal(medicationName, @event.MedicationName);
+            Assert.Equal(quantity, @event.Quantity);
+            Assert.Equal(frequency, @event.Frequency);
+            Assert.Equal(administrationRoute, @event.AdminitrationRoute);
+            Assert.InRange(@event.CreatedDate, DateTime.UtcNow.AddSeconds(-1), DateTime.UtcNow);
+
+            var sutSnapshot = _sut.GetSnapshot();
+
+            var medicationPrescription = Assert.Single(sutSnapshot.Medications);
+            Assert.Equal(_sutId.GetGuid(), medicationPrescription.PrescriptionId);
+            Assert.Equal(medicationPrescriptionId.GetGuid(), medicationPrescription.MedicationPrescriptionId);
+            Assert.Equal(medicationName, medicationPrescription.MedicationName);
+            Assert.Equal(quantity, medicationPrescription.Quantity);
+            Assert.Equal(frequency, medicationPrescription.Frequency);
+            Assert.Equal(administrationRoute, medicationPrescription.AdministrationRoute);
+            Assert.InRange(medicationPrescription.CreatedDate, DateTime.UtcNow.AddSeconds(-1), DateTime.UtcNow);
         }
 
         [Fact]

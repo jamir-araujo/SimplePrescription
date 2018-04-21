@@ -7,6 +7,8 @@ namespace Prescription.Domain
 {
     public class MedicationPrescription : Entity<MedicationPrescriptionId>
     {
+        private readonly DateTimeOffset _createdDate;
+
         private PrescriptionId _prescriptionId;
         private string _medication;
         private decimal _quantity;
@@ -17,9 +19,10 @@ namespace Prescription.Domain
             MedicationPrescriptionId id,
             PrescriptionId prescriptionId,
             string medicationName,
-            int quantity,
+            decimal quantity,
             int frequency,
-            string adminitrationRoute)
+            string adminitrationRoute,
+            DateTimeOffset createdDate)
             : base(id)
         {
             _prescriptionId = prescriptionId;
@@ -27,6 +30,20 @@ namespace Prescription.Domain
             _quantity = quantity;
             _frequency = frequency;
             _administrationRoute = adminitrationRoute;
+
+            _createdDate = createdDate;
+        }
+
+        internal MedicationPrescriptionSnapshot GetSnapshot()
+        {
+            return new MedicationPrescriptionSnapshot(
+                Id.GetGuid(),
+                _prescriptionId.GetGuid(),
+                _medication,
+                _quantity,
+                _frequency,
+                _administrationRoute,
+                _createdDate);
         }
     }
 
