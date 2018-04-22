@@ -14,6 +14,7 @@ namespace Prescription.Domain
         public string PatientName { get; }
         public DateTime CreatedDate { get; }
         public List<MedicationPrescriptionSnapshot> Medications { get; }
+        public DateTime? EndDate { get; }
 
         public PrescriptionSnapshot(
             int version,
@@ -21,13 +22,15 @@ namespace Prescription.Domain
             Guid patientId,
             string patientName,
             DateTime createdDate,
-            IEnumerable<MedicationPrescription> medications)
+            IEnumerable<MedicationPrescription> medications,
+            DateTime? endDate)
             : base(version)
         {
             PrescriptionId = prescriptionId;
             PatientId = patientId;
             PatientName = patientName;
             CreatedDate = createdDate;
+            EndDate = endDate;
 
             Medications = medications?
                 .Select(m => m.GetSnapshot())

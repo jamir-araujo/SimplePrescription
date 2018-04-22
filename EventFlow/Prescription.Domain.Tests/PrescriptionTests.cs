@@ -1,6 +1,7 @@
 using Prescription.Domain;
 using Prescription.Domain.Events;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
@@ -13,7 +14,7 @@ namespace Prescription.Tests
         private readonly Domain.Prescription _sut;
         private readonly Guid _patientId;
         private readonly string _patientName;
-        private readonly PrescriptionSnapshot _orginalSpanshot;
+        private readonly PrescriptionSnapshot _initialState;
 
         public PrescriptionTests()
         {
@@ -23,15 +24,16 @@ namespace Prescription.Tests
             _patientId = Guid.NewGuid();
             _patientName = "John Doe";
 
-            _orginalSpanshot = new PrescriptionSnapshot(
+            _initialState = new PrescriptionSnapshot(
                 _sutInitialVersion,
                 _sutId.GetGuid(),
                 _patientId,
                 _patientName,
                 DateTime.UtcNow,
+                null,
                 null);
 
-            _sut.LoadFromSnapshot(_orginalSpanshot);
+            _sut.LoadFromSnapshot(_initialState);
         }
 
         [Fact]
@@ -49,13 +51,14 @@ namespace Prescription.Tests
             Assert.Equal(_patientName, @event.PatientName);
             Assert.InRange(@event.CreateDate, DateTime.UtcNow.AddSeconds(-1), DateTime.UtcNow);
 
-            var sutSnapshot = newSut.GetSnapshot();
+            var endState = newSut.GetSnapshot();
 
-            Assert.Equal(newSut.Version, sutSnapshot.Version);
-            Assert.Equal(_sutId.GetGuid(), sutSnapshot.PrescriptionId);
-            Assert.Equal(_patientId, sutSnapshot.PatientId);
-            Assert.Equal(_patientName, sutSnapshot.PatientName);
-            Assert.InRange(sutSnapshot.CreatedDate, DateTime.UtcNow.AddSeconds(-1), DateTime.UtcNow);
+            Assert.Equal(newSut.Version, endState.Version);
+            Assert.Equal(_sutId.GetGuid(), endState.PrescriptionId);
+            Assert.Equal(_patientId, endState.PatientId);
+            Assert.Equal(_patientName, endState.PatientName);
+            Assert.InRange(endState.CreatedDate, DateTime.UtcNow.AddSeconds(-1), DateTime.UtcNow);
+            Assert.Null(endState.EndDate);
         }
 
         [Fact]
@@ -131,10 +134,10 @@ namespace Prescription.Tests
             Assert.Equal(administrationRoute, @event.AdminitrationRoute);
             Assert.InRange(@event.CreatedDate, DateTime.UtcNow.AddSeconds(-1), DateTime.UtcNow);
 
-            var sutSnapshot = _sut.GetSnapshot();
+            var endState = _sut.GetSnapshot();
 
-            Assert.Equal(_sut.Version, sutSnapshot.Version);
-            var medicationPrescription = Assert.Single(sutSnapshot.Medications);
+            Assert.Equal(_sut.Version, endState.Version);
+            var medicationPrescription = Assert.Single(endState.Medications);
             Assert.Equal(_sutId.GetGuid(), medicationPrescription.PrescriptionId);
             Assert.Equal(medicationPrescriptionId.GetGuid(), medicationPrescription.MedicationPrescriptionId);
             Assert.Equal(medicationName, medicationPrescription.MedicationName);
@@ -156,6 +159,66 @@ namespace Prescription.Tests
             var administrationRoute = "administrationRoute";
 
             Assert.Throws<InvalidOperationException>(() => newSut.AddMedicationPrescription(medicationPrescriptionId, medicationName, quantity, frequency, administrationRoute));
+        }
+
+        [Fact]
+        public void Release_Should_EmitAPrescriptionReleasedEventAndSetTheEndDate()
+        {
+            var initialState = new PrescriptionSnapshot(
+                _initialState.Version + 1,
+                _initialState.PrescriptionId,
+                _initialState.PatientId,
+                _initialState.PatientName,
+                _initialState.CreatedDate,
+                new List<MedicationPrescription>(),
+                _initialState.EndDate);
+
+            initialState.Medications.Add(new MedicationPrescriptionSnapshot(
+                MedicationPrescriptionId.New.GetGuid(),
+                initialState.PrescriptionId,
+                "medicationName",
+                1,
+                1,
+                "administrationRoute",
+                DateTime.UtcNow));
+
+            _sut.LoadFromSnapshot(initialState);
+
+            var prescriptionEndDate = DateTime.UtcNow.AddDays(1);
+
+            _sut.Relase(prescriptionEndDate);
+
+            var uncommitedEvents = _sut.UncommittedEvents.ToList();
+
+            var uncommitedEvent = Assert.Single(uncommitedEvents);
+            var @event = Assert.IsType<PrescriptionReleased>(uncommitedEvent.AggregateEvent);
+            Assert.Equal(_sut.Id, @event.PrescriptionId);
+            Assert.Equal(prescriptionEndDate, @event.EndDate);
+
+            var endState = _sut.GetSnapshot();
+
+            Assert.Equal(_sut.Version, endState.Version);
+            Assert.Equal(prescriptionEndDate, endState.EndDate);
+        }
+
+        [Fact]
+        public void Release_Should_Throw_When_PrescriptionIsNew()
+        {
+            var newSut = new Domain.Prescription(PrescriptionId.New);
+
+            Assert.Throws<InvalidOperationException>(() => newSut.Relase(DateTime.UtcNow.AddDays(1)));
+        }
+
+        [Fact]
+        public void Release_Should_Throw_When_EndDateIsInThePass()
+        {
+            Assert.Throws<InvalidOperationException>(() => _sut.Relase(DateTime.UtcNow.AddDays(-1)));
+        }
+
+        [Fact]
+        public void Release_Should_Throw_When_PrescriptionHasNotMedications()
+        {
+            Assert.Throws<InvalidOperationException>(() => _sut.Relase(DateTime.UtcNow.AddDays(1)));
         }
     }
 }

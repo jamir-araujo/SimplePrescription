@@ -43,5 +43,18 @@ namespace Prescription
 
             return value;
         }
+
+        public static DateTime NotInThePast(DateTime value, DateTime currentTime, string paramaterName)
+        {
+            var valueUTC = value.ToUniversalTime();
+            currentTime = currentTime.ToUniversalTime();
+
+            if (valueUTC < currentTime)
+            {
+                throw new InvalidOperationException($"parameter {paramaterName} cannot be on tem past");
+            }
+
+            return value;
+        }
     }
 }

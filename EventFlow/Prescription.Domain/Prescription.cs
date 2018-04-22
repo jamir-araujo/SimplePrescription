@@ -16,12 +16,14 @@ namespace Prescription.Domain
         private string _patientName;
         private DateTime _createdDate;
         private List<MedicationPrescription> _medications;
+        private DateTime? _endDate;
 
         internal Prescription(PrescriptionId id)
             : base(id)
         {
             Register<PrescriptionCreated>(OnPrescriptionCreated);
             Register<MedicationPrescriptionAdded>(OnMedicationPrescriptionAdded);
+            Register<PrescriptionReleased>(OnPrescriptionReleased);
         }
 
         public void Create(Guid patientId, string patientName)
@@ -57,7 +59,19 @@ namespace Prescription.Domain
 
         public void Relase(DateTime endDate)
         {
-            throw new NotImplementedException();
+            Checks.NotInThePast(endDate, DateTime.UtcNow, nameof(endDate));
+
+            if (IsNew)
+            {
+                throw new InvalidOperationException("Cannot call Relase on a newly created Prescription");
+            }
+
+            if (_medications == null || _medications.Count == 0)
+            {
+                throw new InvalidOperationException("Cannot release an empty Prescription");
+            }
+
+            Emit(new PrescriptionReleased(Id, endDate));
         }
 
         private void OnPrescriptionCreated(PrescriptionCreated @event)
@@ -80,6 +94,11 @@ namespace Prescription.Domain
                 @event.CreatedDate));
         }
 
+        private void OnPrescriptionReleased(PrescriptionReleased @event)
+        {
+            _endDate = @event.EndDate;
+        }
+
         public PrescriptionSnapshot GetSnapshot()
         {
             return new PrescriptionSnapshot(
@@ -88,7 +107,8 @@ namespace Prescription.Domain
                 _patientId,
                 _patientName,
                 _createdDate,
-                _medications);
+                _medications,
+                _endDate);
         }
 
         public void LoadFromSnapshot(PrescriptionSnapshot snapshot)

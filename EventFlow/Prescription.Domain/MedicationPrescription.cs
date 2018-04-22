@@ -50,8 +50,8 @@ namespace Prescription.Domain
         internal static MedicationPrescription New(MedicationPrescriptionSnapshot snapshot)
         {
             return new MedicationPrescription(
-                new MedicationPrescriptionId(snapshot.MedicationPrescriptionId.ToString()),
-                new PrescriptionId(snapshot.PrescriptionId.ToString()),
+                MedicationPrescriptionId.With(snapshot.MedicationPrescriptionId),
+                PrescriptionId.With(snapshot.PrescriptionId),
                 snapshot.MedicationName,
                 snapshot.Quantity,
                 snapshot.Frequency,
