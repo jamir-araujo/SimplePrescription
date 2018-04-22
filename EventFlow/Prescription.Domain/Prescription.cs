@@ -1,14 +1,16 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using EventFlow.Aggregates;
 using EventFlow.Core;
 using EventFlow.ValueObjects;
 using Newtonsoft.Json;
 using Prescription.Domain.Events;
+using Prescription.Domain.Snapshot;
 
 namespace Prescription.Domain
 {
-    public class Prescription : AggregateRoot<Prescription, PrescriptionId>
+    public class Prescription : AggregateRoot<Prescription, PrescriptionId>, ISnapshotableEntity<PrescriptionSnapshot>
     {
         private Guid _patientId;
         private string _patientName;
@@ -50,7 +52,12 @@ namespace Prescription.Domain
                 throw new InvalidOperationException("Cannot call AddMedicationPrecription on a newly created Prescription");
             }
 
-            Emit(new MedicationPrescriptionAdded(medicationPrescriptionId, Id, medicationName, quantity, frequency, administrationRoute, DateTimeOffset.Now));
+            Emit(new MedicationPrescriptionAdded(medicationPrescriptionId, Id, medicationName, quantity, frequency, administrationRoute, DateTime.UtcNow));
+        }
+
+        public void Relase(DateTime endDate)
+        {
+            throw new NotImplementedException();
         }
 
         private void OnPrescriptionCreated(PrescriptionCreated @event)
@@ -73,7 +80,7 @@ namespace Prescription.Domain
                 @event.CreatedDate));
         }
 
-        internal PrescriptionSnapshot GetSnapshot()
+        public PrescriptionSnapshot GetSnapshot()
         {
             return new PrescriptionSnapshot(
                 Id.GetGuid(),
@@ -81,6 +88,19 @@ namespace Prescription.Domain
                 _patientName,
                 _createdDate,
                 _medications);
+        }
+
+        public void LoadFromSnapshot(PrescriptionSnapshot snapshot)
+        {
+            _patientId = snapshot.PatientId;
+            _patientName = snapshot.PatientName;
+            _createdDate = snapshot.CreatedDate;
+
+            _medications = snapshot.Medications?
+                .Select(MedicationPrescription.New)
+                .ToList();
+
+            Version++;
         }
     }
 

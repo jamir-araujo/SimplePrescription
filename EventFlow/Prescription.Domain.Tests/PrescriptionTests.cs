@@ -12,6 +12,7 @@ namespace Prescription.Tests
         private readonly Domain.Prescription _sut;
         private readonly Guid _patientId;
         private readonly string _patientName;
+        private readonly PrescriptionSnapshot _orginalSpanshot;
 
         public PrescriptionTests()
         {
@@ -21,7 +22,14 @@ namespace Prescription.Tests
             _patientId = Guid.NewGuid();
             _patientName = "John Doe";
 
-            _sut.ApplyEvents(new[] { new PrescriptionCreated(_sutId, _patientId, _patientName, DateTime.UtcNow) });
+            _orginalSpanshot = new PrescriptionSnapshot(
+                _sutId.GetGuid(),
+                _patientId,
+                _patientName,
+                DateTime.UtcNow,
+                null);
+
+            _sut.LoadFromSnapshot(_orginalSpanshot);
         }
 
         [Fact]

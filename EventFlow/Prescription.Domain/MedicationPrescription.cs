@@ -1,13 +1,14 @@
 ﻿using EventFlow.Core;
 using EventFlow.Entities;
 using Prescription.Domain.Events;
+using Prescription.Domain.Snapshot;
 using System;
 
 namespace Prescription.Domain
 {
-    public class MedicationPrescription : Entity<MedicationPrescriptionId>
+    public class MedicationPrescription : Entity<MedicationPrescriptionId>, ISnapshotProvider<MedicationPrescriptionSnapshot>
     {
-        private readonly DateTimeOffset _createdDate;
+        private readonly DateTime _createdDate;
 
         private PrescriptionId _prescriptionId;
         private string _medication;
@@ -22,7 +23,7 @@ namespace Prescription.Domain
             decimal quantity,
             int frequency,
             string adminitrationRoute,
-            DateTimeOffset createdDate)
+            DateTime createdDate)
             : base(id)
         {
             _prescriptionId = prescriptionId;
@@ -34,7 +35,7 @@ namespace Prescription.Domain
             _createdDate = createdDate;
         }
 
-        internal MedicationPrescriptionSnapshot GetSnapshot()
+        public MedicationPrescriptionSnapshot GetSnapshot()
         {
             return new MedicationPrescriptionSnapshot(
                 Id.GetGuid(),
@@ -44,6 +45,18 @@ namespace Prescription.Domain
                 _frequency,
                 _administrationRoute,
                 _createdDate);
+        }
+
+        internal static MedicationPrescription New(MedicationPrescriptionSnapshot snapshot)
+        {
+            return new MedicationPrescription(
+                new MedicationPrescriptionId(snapshot.MedicationPrescriptionId.ToString()),
+                new PrescriptionId(snapshot.PrescriptionId.ToString()),
+                snapshot.MedicationName,
+                snapshot.Quantity,
+                snapshot.Frequency,
+                snapshot.AdministrationRoute,
+                snapshot.CreatedDate);
         }
     }
 

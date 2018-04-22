@@ -11,14 +11,14 @@ namespace Prescription.Domain
         public Guid PrescriptionId { get; }
         public Guid PatientId { get; }
         public string PatientName { get; }
-        public DateTimeOffset CreatedDate { get; }
+        public DateTime CreatedDate { get; }
         public List<MedicationPrescriptionSnapshot> Medications { get; }
 
         public PrescriptionSnapshot(
             Guid prescriptionId,
             Guid patientId, 
             string patientName,
-            DateTimeOffset createdDate,
+            DateTime createdDate,
             IEnumerable<MedicationPrescription> medications)
         {
             PrescriptionId = prescriptionId;
@@ -40,7 +40,7 @@ namespace Prescription.Domain
         public decimal Quantity { get; }
         public int Frequency { get; set; }
         public string AdministrationRoute { get; }
-        public DateTimeOffset CreatedDate { get; }
+        public DateTime CreatedDate { get; }
 
         public MedicationPrescriptionSnapshot(
             Guid id,
@@ -49,7 +49,7 @@ namespace Prescription.Domain
             decimal quantity,
             int frequency,
             string administrationRoute,
-            DateTimeOffset createdDate)
+            DateTime createdDate)
         {
             MedicationPrescriptionId = id;
             PrescriptionId = prescriptionId;

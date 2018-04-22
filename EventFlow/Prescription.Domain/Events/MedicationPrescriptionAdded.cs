@@ -11,7 +11,7 @@ namespace Prescription.Domain.Events
         public decimal Quantity { get; set; }
         public int Frequency { get; set; }
         public string AdminitrationRoute { get; set; }
-        public DateTimeOffset CreatedDate { get; set; }
+        public DateTime CreatedDate { get; set; }
 
         public MedicationPrescriptionAdded(
             MedicationPrescriptionId medicationPrescriptionId,
@@ -20,7 +20,7 @@ namespace Prescription.Domain.Events
             decimal quantity,
             int frequency,
             string adminitrationRoute,
-            DateTimeOffset createDate)
+            DateTime createDate)
         {
             PrescriptionId = prescriptionId;
             MedicationPrescriptionId = medicationPrescriptionId;
