@@ -3,10 +3,11 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Text;
 using EventFlow.Snapshots;
+using Prescription.Domain.Snapshot;
 
 namespace Prescription.Domain
 {
-    public class PrescriptionSnapshot : ISnapshot
+    public class PrescriptionSnapshot : VersionedSnapshot
     {
         public Guid PrescriptionId { get; }
         public Guid PatientId { get; }
@@ -15,11 +16,13 @@ namespace Prescription.Domain
         public List<MedicationPrescriptionSnapshot> Medications { get; }
 
         public PrescriptionSnapshot(
+            int version,
             Guid prescriptionId,
-            Guid patientId, 
+            Guid patientId,
             string patientName,
             DateTime createdDate,
             IEnumerable<MedicationPrescription> medications)
+            : base(version)
         {
             PrescriptionId = prescriptionId;
             PatientId = patientId;

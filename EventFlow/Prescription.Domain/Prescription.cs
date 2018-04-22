@@ -83,6 +83,7 @@ namespace Prescription.Domain
         public PrescriptionSnapshot GetSnapshot()
         {
             return new PrescriptionSnapshot(
+                Version,
                 Id.GetGuid(),
                 _patientId,
                 _patientName,
@@ -92,6 +93,7 @@ namespace Prescription.Domain
 
         public void LoadFromSnapshot(PrescriptionSnapshot snapshot)
         {
+            Version = snapshot.Version;
             _patientId = snapshot.PatientId;
             _patientName = snapshot.PatientName;
             _createdDate = snapshot.CreatedDate;
@@ -99,8 +101,6 @@ namespace Prescription.Domain
             _medications = snapshot.Medications?
                 .Select(MedicationPrescription.New)
                 .ToList();
-
-            Version++;
         }
     }
 

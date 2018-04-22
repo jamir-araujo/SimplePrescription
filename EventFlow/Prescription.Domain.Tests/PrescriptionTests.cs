@@ -8,6 +8,7 @@ namespace Prescription.Tests
 {
     public class PrescriptionTests
     {
+        private readonly int _sutInitialVersion;
         private readonly PrescriptionId _sutId;
         private readonly Domain.Prescription _sut;
         private readonly Guid _patientId;
@@ -16,13 +17,14 @@ namespace Prescription.Tests
 
         public PrescriptionTests()
         {
+            _sutInitialVersion = 1;
             _sutId = PrescriptionId.New;
             _sut = new Domain.Prescription(_sutId);
-
             _patientId = Guid.NewGuid();
             _patientName = "John Doe";
 
             _orginalSpanshot = new PrescriptionSnapshot(
+                _sutInitialVersion,
                 _sutId.GetGuid(),
                 _patientId,
                 _patientName,
@@ -49,6 +51,7 @@ namespace Prescription.Tests
 
             var sutSnapshot = newSut.GetSnapshot();
 
+            Assert.Equal(newSut.Version, sutSnapshot.Version);
             Assert.Equal(_sutId.GetGuid(), sutSnapshot.PrescriptionId);
             Assert.Equal(_patientId, sutSnapshot.PatientId);
             Assert.Equal(_patientName, sutSnapshot.PatientName);
@@ -111,7 +114,7 @@ namespace Prescription.Tests
             var administrationRoute = "administrationRoute";
 
             _sut.AddMedicationPrescription(
-                medicationPrescriptionId, 
+                medicationPrescriptionId,
                 medicationName,
                 quantity,
                 frequency,
@@ -130,6 +133,7 @@ namespace Prescription.Tests
 
             var sutSnapshot = _sut.GetSnapshot();
 
+            Assert.Equal(_sut.Version, sutSnapshot.Version);
             var medicationPrescription = Assert.Single(sutSnapshot.Medications);
             Assert.Equal(_sutId.GetGuid(), medicationPrescription.PrescriptionId);
             Assert.Equal(medicationPrescriptionId.GetGuid(), medicationPrescription.MedicationPrescriptionId);
