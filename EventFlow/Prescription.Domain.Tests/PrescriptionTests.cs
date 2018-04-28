@@ -1,5 +1,6 @@
 using Prescription.Domain;
 using Prescription.Domain.Events;
+using Prescription.Domain.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -64,7 +65,7 @@ namespace Prescription.Tests
         [Fact]
         public void Create_Should_Throw_When_AggregateIsNotNew()
         {
-            Assert.Throws<InvalidOperationException>(() => _sut.Create(_patientId, _patientName));
+            Assert.Throws<AggregateAlreadyCreatedException>(() => _sut.Create(_patientId, _patientName));
         }
 
         [Fact]
@@ -158,7 +159,7 @@ namespace Prescription.Tests
             var frequency = 1;
             var administrationRoute = "administrationRoute";
 
-            Assert.Throws<InvalidOperationException>(() => newSut.AddMedicationPrescription(medicationPrescriptionId, medicationName, quantity, frequency, administrationRoute));
+            Assert.Throws<AggregateNotCreatedException>(() => newSut.AddMedicationPrescription(medicationPrescriptionId, medicationName, quantity, frequency, administrationRoute));
         }
 
         [Fact]
@@ -206,7 +207,7 @@ namespace Prescription.Tests
         {
             var newSut = new Domain.Prescription(PrescriptionId.New);
 
-            Assert.Throws<InvalidOperationException>(() => newSut.Relase(DateTime.UtcNow.AddDays(1)));
+            Assert.Throws<AggregateNotCreatedException>(() => newSut.Relase(DateTime.UtcNow.AddDays(1)));
         }
 
         [Fact]
@@ -218,7 +219,33 @@ namespace Prescription.Tests
         [Fact]
         public void Release_Should_Throw_When_PrescriptionHasNotMedications()
         {
-            Assert.Throws<InvalidOperationException>(() => _sut.Relase(DateTime.UtcNow.AddDays(1)));
+            Assert.Throws<EmptyPrescriptionException>(() => _sut.Relase(DateTime.UtcNow.AddDays(1)));
+        }
+
+        [Fact]
+        public void Release_Should_Throw_When_PrescriptionHasAlreadyBeenReleased()
+        {
+            var state = new PrescriptionSnapshot(
+                3,
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                "PatientName",
+                DateTime.Now,
+                new List<MedicationPrescription>(),
+                DateTime.Now);
+
+            state.Medications.Add(new MedicationPrescriptionSnapshot(
+                MedicationPrescriptionId.New.GetGuid(),
+                state.PrescriptionId,
+                "medicationName",
+                1,
+                1,
+                "administrationRoute",
+                DateTime.UtcNow));
+
+            _sut.LoadFromSnapshot(state);
+
+            Assert.Throws<PrescriptionAlreadyReleasedException>(() => _sut.Relase(DateTime.UtcNow.AddDays(1)));
         }
     }
 }

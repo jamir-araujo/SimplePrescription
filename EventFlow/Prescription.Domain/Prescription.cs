@@ -7,6 +7,7 @@ using EventFlow.ValueObjects;
 using Newtonsoft.Json;
 using Prescription.Domain.Events;
 using Prescription.Domain.Snapshot;
+using Prescription.Domain.Exceptions;
 
 namespace Prescription.Domain
 {
@@ -30,7 +31,7 @@ namespace Prescription.Domain
         {
             if (!IsNew)
             {
-                throw new InvalidOperationException("Cannot call Create on an already existing Prescription");
+                throw new AggregateAlreadyCreatedException(nameof(Prescription));
             }
 
             Emit(new PrescriptionCreated(Id, patientId, patientName, DateTime.UtcNow));
@@ -51,7 +52,7 @@ namespace Prescription.Domain
 
             if (IsNew)
             {
-                throw new InvalidOperationException("Cannot call AddMedicationPrecription on a newly created Prescription");
+                throw new AggregateNotCreatedException(nameof(Prescription), nameof(AddMedicationPrescription));
             }
 
             Emit(new MedicationPrescriptionAdded(medicationPrescriptionId, Id, medicationName, quantity, frequency, administrationRoute, DateTime.UtcNow));
@@ -63,12 +64,17 @@ namespace Prescription.Domain
 
             if (IsNew)
             {
-                throw new InvalidOperationException("Cannot call Relase on a newly created Prescription");
+                throw new AggregateNotCreatedException(nameof(Prescription), nameof(Relase));
             }
 
             if (_medications == null || _medications.Count == 0)
             {
-                throw new InvalidOperationException("Cannot release an empty Prescription");
+                throw new EmptyPrescriptionException();
+            }
+
+            if (_endDate.HasValue)
+            {
+                throw new PrescriptionAlreadyReleasedException();
             }
 
             Emit(new PrescriptionReleased(Id, endDate));
@@ -117,6 +123,7 @@ namespace Prescription.Domain
             _patientId = snapshot.PatientId;
             _patientName = snapshot.PatientName;
             _createdDate = snapshot.CreatedDate;
+            _endDate = snapshot.EndDate;
 
             _medications = snapshot.Medications?
                 .Select(MedicationPrescription.New)
